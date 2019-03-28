@@ -8,6 +8,7 @@
         "no-console": [false],
         "quotemark": [true, "single"],
         "no-debugger": false,
+        "member-ordering": false,
         "semicolon": [true, "never"],
         "interface-name": [true, "never-prefix"],
         "trailing-comma": true,

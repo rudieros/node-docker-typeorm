@@ -27,35 +27,48 @@ export interface InputOptions {
 }
 
 export class Endpoint<ResponseBody, Body = undefined, Params = undefined, Query = undefined> {
-    httpMethod: HttpMethod = HttpMethod.GET
-    serviceParent: Service
-    endpointPath: string
-    inputBody: new () => Body
-    response: new () => ResponseBody
-    allowedRoles: string[]
+    handler: Handler<ResponseBody, Body, Params, Query>
+    method?: HttpMethod = HttpMethod.GET
+    service: Service
+    path?: string
+    body?: new () => Body
+    response?: new () => ResponseBody
+    allowedRoles?: string[]
 
-    constructor(
-        private handler: Handler<ResponseBody, Body, Params, Query>
-    ) {}
+    constructor({
+        path,
+        body,
+        method,
+        service,
+        handler,
+        response,
+                }: Endpoint<ResponseBody, Body, Params, Query>) {
+        this.body = body
+        this.path = path
+        this.method = method
+        this.service = service
+        this.handler = handler
+        this.response = response
+    }
 
-    method(method: HttpMethod) {
-        this.httpMethod = method
-        return this
-    }
-    service(service: Service) {
-        this.serviceParent = service
-        return this
-    }
-    path(path: string) {
-        this.endpointPath = path
-        return this
-    }
-    body(body: new () => Body, options?: InputOptions) {
-        this.inputBody = body
-    }
-    allowRoles(allowedRoles: string[]) {
-        this.allowedRoles = allowedRoles
-        return this
-    }
+    // method(method: HttpMethod) {
+    //     this.method = method
+    //     return this
+    // }
+    // service(service: Service) {
+    //     this.service = service
+    //     return this
+    // }
+    // path(path: string) {
+    //     this.path = path
+    //     return this
+    // }
+    // body(body: new () => Body, options?: InputOptions) {
+    //     this.body = body
+    // }
+    // allowRoles(allowedRoles: string[]) {
+    //     this.allowedRoles = allowedRoles
+    //     return this
+    // }
 
 }

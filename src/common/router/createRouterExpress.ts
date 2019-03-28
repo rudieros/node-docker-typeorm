@@ -4,6 +4,11 @@ import { Router } from './models/Router'
 import { logger } from '../logger/logger'
 import { Endpoint, Route } from './models/Endpoint'
 import { validateInput } from './validateInput'
+import { HttpMethod } from './models/HttpMethod'
+import { SuccessResponse } from './models/SuccessResponse'
+import { ErrorResponse } from './models/ErrorResponse'
+import { Lang } from '../error'
+import { getLanguage } from '../error/language'
 
 export const createRouterExpress = () => {
     const expressRouter = express.Router()
@@ -46,7 +51,7 @@ const addSingleRouteToExpress = (expressRouter: express.Router, router: Router) 
                 body: req.body,
                 query: req.query,
                 params: req.params,
-                logger, // TODO build route-specific logger
+                logger, // TODO toResponse route-specific logger
             }, {})
 
             res.json(response)
@@ -55,38 +60,55 @@ const addSingleRouteToExpress = (expressRouter: express.Router, router: Router) 
 
 const addEndpointToExpress = (expressRouter: express.Router) => (filePath: string) => {
     const module = require(filePath)
-    const isRouter = module.default instanceof Endpoint
+    const isEndpoint = module.default instanceof Endpoint
     console.log('Heyy', module.default.metaRouter)
 
-    // if (!isRouter) {
-    //     logger.warn(`Skiping the following file as it does not
-    //         export an instance of Endpoint by default: ${filePath}`)
-    //     return
-    // }
-    //
-    // const endpoint = module as Endpoint
+    if (!isEndpoint) {
+        logger.warn(`Skiping the following file as it does not
+            export an instance of Endpoint by default: ${filePath}`)
+        return
+    }
 
-    // expressRouter[ endpoint.method ](`/${router.basePath}/${route.path}`,
-    //     async (req: express.Request, res: express.Response) => {
-    //
-    //         // Validate inputs
-    //         await validateObject(route.body, req.body)
-    //         await validateObject(route.params, req.params)
-    //         await validateObject(route.query, req.query)
-    //
-    //         const response = await route.handler({
-    //             body: req.body,
-    //             query: req.query,
-    //             params: req.params,
-    //             logger, // TODO build route-specific logger
-    //         }, {})
-    //
-    //         res.json(response)
-    //     })
+    const endpoint = module.default as Endpoint<any>
+    expressRouter[ endpoint.method || HttpMethod.GET ](`/${endpoint.service.basePath}/${endpoint.path}`,
+        async (req: express.Request, res: express.Response) => {
+            try {
+                // Validate inputs
+                await validateObject(endpoint.body, req.body)
+
+                const response = await endpoint.handler({
+                    body: req.body,
+                    query: req.query,
+                    params: req.params,
+                    logger, // TODO toResponse route-specific logger
+                }, {})
+
+                sendSuccessResponse(res, response)
+            } catch (e) {
+                sendErrorResponse(res, e)
+            }
+        })
 }
 
 const validateObject = async (validateClass?: new () => any, validateObjct?: any) => {
     if (validateClass && validateObjct) {
         await validateInput(validateObjct, validateClass)
+    }
+}
+
+const sendSuccessResponse = (res: express.Response, response: any) => {
+    if (response instanceof SuccessResponse) {
+        res.status(response.statusCode).json({ data: response.body })
+    } else {
+        res.json({ data: response })
+    }
+}
+
+const sendErrorResponse = (res: express.Response, e: any) => {
+    console.log('Instance of error', e instanceof ErrorResponse)
+    if (e instanceof ErrorResponse) {
+        res.status(e.statusCode).json({ e: e.body })
+    } else {
+        res.json(e)
     }
 }

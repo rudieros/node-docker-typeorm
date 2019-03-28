@@ -1,11 +1,8 @@
 import { IsString } from 'class-validator'
-import { UserService } from './service/user.service'
-import { Service } from '../../common/router/decorators/Service'
-import { Path } from '../../common/router/decorators/Path'
-import { Body } from '../../common/router/decorators/Body'
 import { Endpoint } from '../../common/router/models/Endpoint'
-import { User } from '../../models/User'
+import { UserService } from './service/user.service'
 import { HttpMethod } from '../../common/router/models/HttpMethod'
+import { User } from '../../models/User'
 
 export class CreateUserBody {
     @IsString()
@@ -24,11 +21,14 @@ export class CreateUserBody {
 //     }
 // }
 
-export default new Endpoint<User, CreateUserBody>(async (
-    { body }, { userId }) => {
-    console.log('Body', body)
-    return body as User
+export default new Endpoint({
+    service: UserService,
+    path: '/',
+    method: HttpMethod.POST,
+    body: CreateUserBody,
+    response: User,
+    handler: async ({ body }, { userId }) => {
+        console.log('Body', body)
+        return body
+    },
 })
-    .method(HttpMethod.POST)
-    .service(UserService)
-    .path('/')
