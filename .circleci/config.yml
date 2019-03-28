@@ -3,9 +3,19 @@
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
 version: 2.1
+<<<<<<< HEAD
 orbs:
   aws-ecr: circleci/aws-ecr@3.1.0
   awsebcli: sbc-orbs/awsebcli@0.0.3
+=======
+#executors:
+#  my-executor:
+#    docker:
+#      - image: circleci/python:2.7
+orbs:
+  awsebcli: sbc-orbs/awsebcli@0.0.3
+  aws-ecr: circleci/aws-ecr@3.1.0
+>>>>>>> dev
 #notify:
 #  webhooks:
 #  - url: https://pru.appsimples.com.br/hooks/RXe5MFvQGspYYcxAj/CqR93J4SoCAv4ypHhyzt6AAnTCBv98eW7LT9Qwhg7E3hnDh7
@@ -34,24 +44,22 @@ jobs:
 
   release-staging:
     docker:
-    - image: circleci/node:7.10
+      - image: circleci/python:2.7
     working_directory: ~/repo
     steps:
-    - checkout
-    - restore_cache:
-        name: Restore Yarn Package Cache
-        key: yarn-packages-{{ checksum "yarn.lock" }}
-    - run:
-        name: Installing Dependencies
-        command: yarn install --frozen-lockfile
-    - save_cache:
-        name: Save Yarn Package Cache
-        key: yarn-packages-{{ checksum "yarn.lock" }}
-        paths:
-        - ~/.cache/yarn
-    - run:
-        name: Deploy staging
-        command: yarn deploy:staging
+      - checkout
+      - run:
+          name: Print Content
+          command: |
+            ls -la
+      - run:
+          name: Install Elastic Beanstalk cli
+          command: |
+            sudo pip install awsebcli --upgrade
+      - run:
+          name: Deploy to Elastic Beanstalk
+          command: |
+            eb deploy NodeTypeorm-env
 
   release-production:
     docker:
@@ -78,6 +86,7 @@ workflows:
   version: 2
   deploy-staging:
     jobs:
+<<<<<<< HEAD
     - awsebcli/install
     - aws-ecr/build_and_push_image:
         account-url: "186262579074.dkr.ecr.us-east-1.amazonaws.com"
@@ -85,10 +94,22 @@ workflows:
         region: us-east-1
         tag: "${CIRCLE_SHA1}"
     - release-staging:
+=======
+    - aws-ecr/build_and_push_image:
+        account-url: AWS_ECR_REPO_URL
+        repo: ${AWS_RESOURCE_NAME_PREFIX}
+        region: AWS_DEFAULT_REGION
+        tag: latest
+    - release-staging:
+        requires:
+#          - awsebcli/install
+          - aws-ecr/build_and_push_image
+>>>>>>> dev
         filters:
           branches:
             only:
             - dev
+<<<<<<< HEAD
   build-and-deploy-development:
     jobs:
     - release-development:
@@ -96,3 +117,12 @@ workflows:
           branches:
             only:
             - /^release.*/
+=======
+#  build-and-deploy-development:
+#    jobs:
+#    - release-development:
+#        filters:
+#          branches:
+#            only:
+#            - /^release.*/
+>>>>>>> dev
