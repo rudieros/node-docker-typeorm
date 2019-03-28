@@ -1,4 +1,4 @@
-import { Handler } from '../../_common/router/models/Handler'
+import { Handler } from '../../common/router/models/Handler'
 
 export const me: Handler = async ({
     body,

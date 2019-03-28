@@ -31,7 +31,8 @@ const addRouterToExpress = (expressRouter: express.Router) => (routerFilePath: s
 
 const addSingleRoute = (expressRouter: express.Router, router: Router) => (route: Route) => {
     // TODO validate inputs, and validate route config
-    expressRouter[route.method](`/${router.basePath}/${route.path}`, async (req: express.Request, res: express.Response) => {
+    expressRouter[route.method](`/${router.basePath}/${route.path}`,
+        async (req: express.Request, res: express.Response) => {
         const response = await route.handler({
             body: req.body,
             query: req.query,
@@ -39,6 +40,6 @@ const addSingleRoute = (expressRouter: express.Router, router: Router) => (route
             logger, // TODO build route-specific logger
         }, {})
 
-        res.json(JSON.stringify(response))
+        res.json(response)
     })
 }

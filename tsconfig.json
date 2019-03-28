@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2015",
     "module": "commonjs",
     "outDir": "./build",
     "lib": [
@@ -18,8 +18,10 @@
     "moduleResolution": "node",
     "isolatedModules": true
   },
+  "exclude": [
+    "**/*.test.ts"
+  ],
   "include": [
-    "server.ts",
-    "*.service/**/*"
+    "src/**/*.ts"
   ]
 }
