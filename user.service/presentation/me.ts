@@ -5,6 +5,6 @@ export const me: Handler = async ({
 }) => {
     console.log('Body arrived!', body)
     return {
-        hey: true
+        hey_man2: 'haaaaaa'
     }
 }
