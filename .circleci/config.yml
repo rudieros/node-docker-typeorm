@@ -1,0 +1,98 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@3.1.0
+  awsebcli: sbc-orbs/awsebcli@0.0.3
+#notify:
+#  webhooks:
+#  - url: https://pru.appsimples.com.br/hooks/RXe5MFvQGspYYcxAj/CqR93J4SoCAv4ypHhyzt6AAnTCBv98eW7LT9Qwhg7E3hnDh7
+jobs:
+  release-development:
+    docker:
+    - image: circleci/node:7.10
+    working_directory: ~/repo
+    steps:
+    - checkout
+    - restore_cache:
+        name: Restore Yarn Package Cache
+        key: yarn-packages-{{ checksum "yarn.lock" }}
+    - run:
+        name: Installing Dependencies
+        command: yarn install --frozen-lockfile
+    - save_cache:
+        name: Save Yarn Package Cache
+        key: yarn-packages-{{ checksum "yarn.lock" }}
+        paths:
+        - ~/.cache/yarn
+    - run:
+        name: Deploy development
+        command: yarn deploy:development
+
+
+  release-staging:
+    docker:
+    - image: circleci/node:7.10
+    working_directory: ~/repo
+    steps:
+    - checkout
+    - restore_cache:
+        name: Restore Yarn Package Cache
+        key: yarn-packages-{{ checksum "yarn.lock" }}
+    - run:
+        name: Installing Dependencies
+        command: yarn install --frozen-lockfile
+    - save_cache:
+        name: Save Yarn Package Cache
+        key: yarn-packages-{{ checksum "yarn.lock" }}
+        paths:
+        - ~/.cache/yarn
+    - run:
+        name: Deploy staging
+        command: yarn deploy:staging
+
+  release-production:
+    docker:
+    - image: circleci/node:7.10
+    working_directory: ~/repo
+    steps:
+    - checkout
+    - restore_cache: # special step to restore the dependency cache
+        name: Restore Yarn Package Cache
+        key: yarn-packages-{{ checksum "yarn.lock" }}
+    - run:
+        name: Installing Dependencies
+        command: yarn install
+    - save_cache:
+        name: Save Yarn Package Cache
+        key: yarn-packages-{{ checksum "yarn.lock" }}
+        paths:
+        - ~/.cache/yarn
+    - run:
+        name: Deploy Production
+        command: yarn deploy:production
+
+workflows:
+  version: 2
+  deploy-staging:
+    jobs:
+    - awsebcli/install
+    - aws-ecr/build_and_push_image:
+        account-url: "186262579074.dkr.ecr.us-east-1.amazonaws.com"
+        repo: "node-typeorm"
+        region: us-east-1
+        tag: "${CIRCLE_SHA1}"
+    - release-staging:
+        filters:
+          branches:
+            only:
+            - dev
+  build-and-deploy-development:
+    jobs:
+    - release-development:
+        filters:
+          branches:
+            only:
+            - /^release.*/
