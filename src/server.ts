@@ -1,3 +1,5 @@
+// tslint:disable-next-line
+require('source-map-support').install()
 import express from 'express'
 import { createRouterExpress } from './common/router/createRouterExpress'
 import {setupDatabase} from './common/database/setup'

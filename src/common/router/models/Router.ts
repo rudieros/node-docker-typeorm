@@ -1,4 +1,4 @@
-import { Route } from './Route'
+import { Route } from './Endpoint'
 
 export class Router {
     public basePath: string

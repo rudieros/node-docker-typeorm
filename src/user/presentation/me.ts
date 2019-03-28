@@ -4,7 +4,7 @@ import User from '../../common/database/models/user'
 
 export const me: Handler = async ({
     body,
-}) => {
+}, { req }) => {
     console.log('Body arrived!', body)
 
     const userRepository = getRepository(User)
