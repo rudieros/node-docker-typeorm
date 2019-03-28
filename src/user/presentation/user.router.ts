@@ -1,5 +1,5 @@
-import { Router } from '../../_common/router/models/Router'
-import { HttpMethod } from '../../_common/router/models/HttpMethod'
+import { Router } from '../../common/router/models/Router'
+import { HttpMethod } from '../../common/router/models/HttpMethod'
 import { me } from './me'
 
 export default new Router({

@@ -1,5 +1,5 @@
 import express from 'express'
-import { createRouterExpress } from './_common/router/createRouterExpress'
+import { createRouterExpress } from './common/router/createRouterExpress'
 
 const app = express()
 
