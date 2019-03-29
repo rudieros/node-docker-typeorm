@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Application } from 'express'
 import glob from 'glob'
 import { Router } from './models/Router'
 import { logger } from '../logger/logger'
@@ -7,10 +7,16 @@ import { validateInput } from './validateInput'
 import { HttpMethod } from './models/HttpMethod'
 import { SuccessResponse } from './models/SuccessResponse'
 import { ErrorResponse } from './models/ErrorResponse'
-import { Lang } from '../error'
-import { getLanguage } from '../error/language'
+import { RouterAuthConfig } from './models/RouterAuthConfig'
 
-export const createRouterExpress = () => {
+export interface ExpressRouterContext {
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+    router: express.Router,
+}
+
+export const createRouterExpress = (authConfig?: RouterAuthConfig) => {
     const expressRouter = express.Router()
     const lookupRouterGlob = process.cwd() + '/**/*.router.js'
     const lookupRouteGlob = process.cwd() + '/**/*.route.js'
@@ -40,7 +46,7 @@ const addRouterToExpress = (expressRouter: express.Router) => (routerFilePath: s
 
 const addSingleRouteToExpress = (expressRouter: express.Router, router: Router) => async (route: Route) => {
     expressRouter[ route.method ](`/${router.basePath}/${route.path}`,
-        async (req: express.Request, res: express.Response) => {
+        async (req: express.Request, res: express.Response, next: express.NextFunction) => {
 
             // Validate inputs
             await validateObject(route.body, req.body)
@@ -52,7 +58,9 @@ const addSingleRouteToExpress = (expressRouter: express.Router, router: Router) 
                 query: req.query,
                 params: req.params,
                 logger, // TODO toResponse route-specific logger
-            }, {})
+            }, {
+                req, res, next, router: expressRouter,
+            } as ExpressRouterContext)
 
             res.json(response)
         })
@@ -61,7 +69,6 @@ const addSingleRouteToExpress = (expressRouter: express.Router, router: Router) 
 const addEndpointToExpress = (expressRouter: express.Router) => (filePath: string) => {
     const module = require(filePath)
     const isEndpoint = module.default instanceof Endpoint
-    console.log('Heyy', module.default.metaRouter)
 
     if (!isEndpoint) {
         logger.warn(`Skiping the following file as it does not
