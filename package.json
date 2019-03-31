@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsc && node --inspect=8001 build/server.js",
+    "start": "tsc && node build/server.js",
     "dev": "nodemon",
     "build": "tsc",
     "test": "tsc && jest",

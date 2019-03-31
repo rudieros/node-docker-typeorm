@@ -5,4 +5,4 @@ export type Handler<ResponseBody = any, InputBody = any, Params = any, Query = a
     (
         input: EndpointInput<InputBody, Params, Query>,
         context: any,
-    ) => ResponseBody | Promise<ResponseBody> | Promise<SuccessResponse<ResponseBody>> | Promise<void> | void
+    ) => ResponseBody | Promise<ResponseBody> | Promise<SuccessResponse<ResponseBody>>

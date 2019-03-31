@@ -4,7 +4,10 @@ import { AuthService } from './service/AuthService'
 import { IsEmail, IsString } from 'class-validator'
 import { User } from '../../models/User'
 import { ApplicationContext } from '../../applicationContext'
-import { passportInstance } from '../../server'
+import { LocalLoginUseCase } from '../../common/authorizer/useCases/LocalLoginUseCase'
+import { JWTRepository } from '../../common/authorizer/preAvailableDatabases/JWTRepository'
+import { SuccessResponse } from '../../common/router/models/SuccessResponse'
+import { PassportLocalAuthenticator } from '../../common/authorizer/preAvailableDatabases/PassportLocalAuthenticator'
 
 export class LoginBody {
     @IsEmail()
@@ -14,13 +17,16 @@ export class LoginBody {
 }
 
 export default new Endpoint({
-    handler: async ({ body, }, { req, res, next, router }: ApplicationContext) => {
-        await new Promise((resolve, reject) => {
-            console.log('Called handler')
-            passportInstance.authenticate('local', { session: false }, (err, user, info) => {
-                console.log('Ha', user, req.login, info)
-                resolve()
-            })(req, res, next)
+    handler: async ({ body }, { req, res, next }: ApplicationContext) => {
+        const useCase = new LocalLoginUseCase(
+            new JWTRepository(),
+            new PassportLocalAuthenticator({ req, res, next }),
+        )
+
+        const { token, user, } = await useCase.exec()
+
+        return new SuccessResponse(user).setHeaders({
+            token,
         })
     },
     method: HttpMethod.POST,

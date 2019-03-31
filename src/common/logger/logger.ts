@@ -1,13 +1,13 @@
-const template = (info: string) => `[LOGGER - ${new Date().toTimeString()}] ${info}`
+const template = (tag: string) => `[OS_LOGGER_${tag} - ${new Date().toISOString()}] -\n`
 export const logger = {
     info: (message: any) => {
-        console.log(colors.fg.Blue, template(message), colors.Reset)
+        console.log(colors.fg.Blue, template('INFO'), colors.Reset, message)
     },
     warn: (message: any) => {
-        console.log(colors.fg.Yellow, template(message), colors.Reset)
+        console.log(colors.fg.Yellow, template('WARNING'), colors.Reset, message)
     },
     error: (message: any) => {
-        console.log(colors.fg.Red, template(message), colors.Reset)
+        console.log(colors.fg.Red, template('ERROR'), colors.Reset, message)
     },
 }
 

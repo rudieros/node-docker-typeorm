@@ -1,7 +1,7 @@
-import { AuthorizerDataSourceJWT } from './dataSources/AuthorizerDataSourceJWT'
-import { Strategy as LocalStrategy, IStrategyOptions } from 'passport-local'
+import { AuthDataSource } from './dataSources/AuthDataSource'
+import { IStrategyOptions, Strategy as LocalStrategy } from 'passport-local'
 
-export const passportLocalStrategy = (authorizer: AuthorizerDataSourceJWT, config: {
+export const passportLocalStrategy = (authorizer: AuthDataSource, config: {
     usernameField: string,
     passwordField: string,
 }) => {
@@ -9,20 +9,17 @@ export const passportLocalStrategy = (authorizer: AuthorizerDataSourceJWT, confi
         usernameField: config.usernameField,
         passwordField: config.passwordField,
     }
-    return new LocalStrategy(options, (username, password, callback) => {
-        console.log('Will call')
+    return new LocalStrategy(options, async (username, password, callback) => {
         callback(null, { user: true })
-        // try {
-        //     console.log('Will find user')
-        //     const user = await authorizer.findUserByUsername(username)
-        //     console.log('User', user)
-        //     if (!user) {
-        //         callback('User not found', false)
-        //     } else {
-        //         callback(null, user)
-        //     }
-        // } catch (e) {
-        //     callback(e, false, { message: `Error getting user: ${e}`})
-        // }
+        try {
+            const user = await authorizer.findUserByUsername(username)
+            if (!user) {
+                callback('User not found', false)
+            } else {
+                callback(null, user)
+            }
+        } catch (e) {
+            callback(e, false, { message: `Error getting user: ${e}`})
+        }
     })
 }

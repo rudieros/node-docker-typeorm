@@ -14,12 +14,14 @@ export class SuccessResponse<OutputBody> extends BaseResponse {
 
   public setResponse = (response: any) => {
     this.response = response
+    return this
   }
 
   public setHeaders = (headers: any) => {
     this.headers = {
       ...headers,
     }
+    return this
   }
 
   // public setAuthorization = (authorization: Authorization) => {

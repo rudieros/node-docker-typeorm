@@ -1,7 +1,7 @@
-import { AuthorizerDataSourceJWT } from './dataSources/AuthorizerDataSourceJWT'
+import { AuthDataSource } from './dataSources/AuthDataSource'
 import { Strategy as JwtStrrategy, ExtractJwt, StrategyOptions, VerifiedCallback } from 'passport-jwt'
 
-export const passportJWTStrategy = (authorizer: AuthorizerDataSourceJWT) => {
+export const passportJWTStrategy = (authorizer: AuthDataSource) => {
     const options: StrategyOptions = {
         issuer: 'appsimples',
         audience: 'appsimples',

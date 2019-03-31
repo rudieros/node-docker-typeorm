@@ -1,12 +1,9 @@
 import { Application } from 'express'
-import { passportJWTStrategy } from './passportJWTStrategy'
-import { AuthorizerDataSourceJWT } from './dataSources/AuthorizerDataSourceJWT'
+import { AuthDataSource } from './dataSources/AuthDataSource'
 import { passportLocalStrategy } from './passportLocalStrategy'
-import { PassportStatic } from 'passport'
-import { Strategy } from 'passport-local'
+import passport from 'passport'
 
 export interface ExpressJwtAuthConfig {
-    loginRoute?: string
     usernameField?: string
     passwordField?: string
 }
@@ -18,18 +15,23 @@ const defaultExpressJwtAuthConfig = {
 }
 
 export const expressUseJwtAuth = (
-    passport: PassportStatic,
+    app: Application,
+    authDataSource: AuthDataSource,
+    config: ExpressJwtAuthConfig = defaultExpressJwtAuthConfig,
 ) => {
 
     // Add local login with username and password strategy
-    // passport.use(passportLocalStrategy(authDataSource, {
-    //     usernameField: config.usernameField || defaultExpressJwtAuthConfig.usernameField,
-    //     passwordField: config.passwordField || defaultExpressJwtAuthConfig.passwordField,
-    // }))
-    passport.use(new Strategy((username, password, callback) => {
-        console.log('Callback here')
-        callback(null, { user: true })
+    passport.use(passportLocalStrategy(authDataSource, {
+        usernameField: config.usernameField || defaultExpressJwtAuthConfig.usernameField,
+        passwordField: config.passwordField || defaultExpressJwtAuthConfig.passwordField,
     }))
+    // passport.use('local', new Strategy({
+    //     usernameField: 'email',
+    //     passwordField: 'password',
+    // }, (username, password, callback) => {
+    //     console.log('Callback here')
+    //     callback(null, { user: true })
+    // }))
 
     // add jwt authentication
     // passport.use(passportJWTStrategy(authDataSource))

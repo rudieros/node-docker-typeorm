@@ -8,6 +8,7 @@ import { HttpMethod } from './models/HttpMethod'
 import { SuccessResponse } from './models/SuccessResponse'
 import { ErrorResponse } from './models/ErrorResponse'
 import { RouterAuthConfig } from './models/RouterAuthConfig'
+import { BaseResponse } from './models/BaseResponse'
 
 export interface ExpressRouterContext {
     req: express.Request,
@@ -78,7 +79,10 @@ const addEndpointToExpress = (expressRouter: express.Router) => (filePath: strin
 
     const endpoint = module.default as Endpoint<any>
     expressRouter[ endpoint.method || HttpMethod.GET ](`/${endpoint.service.basePath}/${endpoint.path}`,
-        async (req: express.Request, res: express.Response) => {
+        async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+            const context: ExpressRouterContext = {
+                req, res, next, router: expressRouter,
+            }
             try {
                 // Validate inputs
                 await validateObject(endpoint.body, req.body)
@@ -88,7 +92,7 @@ const addEndpointToExpress = (expressRouter: express.Router) => (filePath: strin
                     query: req.query,
                     params: req.params,
                     logger, // TODO toResponse route-specific logger
-                }, {})
+                }, context)
 
                 sendSuccessResponse(res, response)
             } catch (e) {
@@ -105,17 +109,27 @@ const validateObject = async (validateClass?: new () => any, validateObjct?: any
 
 const sendSuccessResponse = (res: express.Response, response: any) => {
     if (response instanceof SuccessResponse) {
-        res.status(response.statusCode).json({ data: response.body })
+        appendHeaders(response, res)
+            .status(response.statusCode)
+            .json({ data: response.body })
     } else {
         res.json({ data: response })
     }
 }
 
 const sendErrorResponse = (res: express.Response, e: any) => {
-    console.log('Instance of error', e instanceof ErrorResponse)
     if (e instanceof ErrorResponse) {
-        res.status(e.statusCode).json({ e: e.body })
+        appendHeaders(e, res)
+            .status(e.statusCode)
+            .json({ e: e.body })
     } else {
-        res.json(e)
+        res.status(400).json(e)
     }
+}
+
+const appendHeaders = (response: BaseResponse, res: express.Response) => {
+    Object.keys(response.headers || {}).forEach((header) => {
+        res.append(header, response.headers[header])
+    })
+    return res
 }

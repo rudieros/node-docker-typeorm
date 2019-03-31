@@ -1,8 +1,14 @@
 import { Auth } from '../models/Auth'
-import { AuthorizerDataSourceJWT } from '../dataSources/AuthorizerDataSourceJWT'
+import { AuthDataSource } from '../dataSources/AuthDataSource'
 
-export class TypeORMJWTAuthorizerDatabase implements AuthorizerDataSourceJWT {
-    constructor() { // TODO receive TypeORM object
+export interface TypeORMAuthDatabaseConfig {
+    usernameField?: string
+}
+
+export class TypeORMAuthDatabase implements AuthDataSource {
+    constructor(
+        private config: TypeORMAuthDatabaseConfig,
+    ) { // TODO receive TypeORM object and config
 
     }
 
