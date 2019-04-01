@@ -7,7 +7,7 @@
     "username": "admin",
     "password": "admin",
     "database": "pets",
-    "logging": true,
+    "logging": false,
     "synchronize": true,
     "entities": [
       "build/common/database/models/*.js"

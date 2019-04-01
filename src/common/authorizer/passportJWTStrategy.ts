@@ -1,7 +1,6 @@
-import { AuthDataSource } from './dataSources/AuthDataSource'
-import { Strategy as JwtStrrategy, ExtractJwt, StrategyOptions, VerifiedCallback } from 'passport-jwt'
+import { Strategy as JwtStrrategy, StrategyOptions, VerifiedCallback } from 'passport-jwt'
 
-export const passportJWTStrategy = (authorizer: AuthDataSource) => {
+export const passportJWTStrategy = () => {
     const options: StrategyOptions = {
         secretOrKey: 'outsmart', // TODO replace with actual keys
         jwtFromRequest: (req: any) => {

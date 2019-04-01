@@ -18,7 +18,6 @@ export default new Endpoint({
     body: CreateUserBody,
     response: User,
     handler: async ({ body }, { userId }) => {
-        console.log('Body', body)
         return body
     },
 })

@@ -14,7 +14,13 @@ export class LocalLoginUseCase {
     ) {}
 
     async exec(username: string, password: string): Promise<{ token: string, auth: NoPassword<Auth> }> {
-        const { password: storedPassword, ...auth } = await this.authDataSource.findUserByUsername(username)
+        const authResult = await this.authDataSource.findUserByUsername(username)
+        console.log('Result in use case', authResult)
+
+        if (!authResult) {
+            throw new OSError('UserNotFound', 'Could not find user with given username in the database')
+        }
+        const { password: storedPassword, ...auth } = authResult
 
         await this.passwordValidator.verifyPassword(storedPassword, password).catch((e) => {
             throw new OSError('Unauthorized', `Error validating password: ${e}`, 401)

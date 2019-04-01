@@ -8,11 +8,11 @@ import { TokenDataSource } from '../dataSources/TokenDataSource'
 import { NoPassword } from '../types/NoPasswordType'
 
 export class LocalSignUpUseCase {
-    constructor(private authDataSource: AuthDataSource,
-                private passwordValidator: PasswordValidator,
-                private passwordPolicyVerifier: PasswordPolicyVerifier,
-                private tokenDataSource: TokenDataSource) {
-    }
+    constructor(
+        private authDataSource: AuthDataSource,
+        private passwordValidator: PasswordValidator,
+        private passwordPolicyVerifier: PasswordPolicyVerifier,
+        private tokenDataSource: TokenDataSource) {}
 
     async exec(user: NoId<Auth>): Promise<{ auth: NoPassword<Auth>, token: string }> {
         const { valid, reasons } = await this.passwordPolicyVerifier.verifyPassword(user.password)
@@ -24,8 +24,8 @@ export class LocalSignUpUseCase {
 
         const { password, ...auth } = await this.authDataSource.createUser(user, hashPassword)
             .catch((e) => {
-                throw new OSError('UnkownError', `Error creating user: ${e}`)
-            })
+            throw new OSError('UnkownError', `Error creating user: ${e}`)
+        })
 
         const token = await this.tokenDataSource.createToken(auth)
 

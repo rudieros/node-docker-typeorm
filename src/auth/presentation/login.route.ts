@@ -9,6 +9,7 @@ import { SuccessResponse } from '../../common/router/models/SuccessResponse'
 import { TypeORMAuthDatabase } from '../../common/authorizer/preAvailableDatabases/TypeORMAuthDatabase'
 import { Auth } from '../../common/authorizer/models/Auth'
 import { BcryptPasswordValidator } from '../../common/authorizer/preAvailableDatabases/BcryptPasswordValidator'
+import { getRepository } from 'typeorm'
 
 export class LoginBody {
     @IsEmail()
@@ -18,11 +19,11 @@ export class LoginBody {
 }
 
 export default new Endpoint({
-    handler: async ({ body }, { req, res, next }: ApplicationContext) => {
+    handler: async ({ body }, { repos }: ApplicationContext) => {
         const useCase = new LocalLoginUseCase(
-            new JWTRepository(),
-            new TypeORMAuthDatabase({ usernameField: 'email' }), // TODO many places using this, find a good way to extract,
-            new BcryptPasswordValidator(),
+            repos.getJwtRepo(),
+            repos.getAuthRepo(),
+            repos.getPasswordValidatorRepo(),
         )
 
         const { token, auth } = await useCase.exec(body.email, body.password)

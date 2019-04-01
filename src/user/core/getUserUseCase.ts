@@ -1,12 +1,12 @@
 import { User } from '../../models/User'
+import { AuthDataSource } from '../../common/authorizer/dataSources/AuthDataSource'
 
 export class GetUserUseCase {
-    constructor() {}
+    constructor(
+        private authDataSource: AuthDataSource,
+    ) {}
 
     async exec(id: string): Promise<User> {
-        return {
-            name: 'Rudi',
-            email: 'rudierosdfr@gmail.com',
-        }
+        return this.authDataSource.findUserById(id) as any
     }
 }

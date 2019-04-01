@@ -91,7 +91,7 @@ const addEndpointToExpress = (expressRouter: express.Router, authConfig: RouterA
             const logger = buildExpressLogger(req)
             logger.info('Request initiated')
             const context: ExpressRouterContext = {
-                req, res, next, router: expressRouter, authorization: req.user,
+                req, res, next, router: expressRouter, authorization: req.user, ...authConfig.context,
             }
             try {
                 // Validate inputs

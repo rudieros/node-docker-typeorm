@@ -20,12 +20,12 @@ export class SignUpBody {
 }
 
 export default new Endpoint({
-    handler: async ({ body }, { req, res, next }: ApplicationContext) => {
+    handler: async ({ body }, { repos }: ApplicationContext) => {
         const useCase = new LocalSignUpUseCase(
-            new TypeORMAuthDatabase({ usernameField: 'email' }), // TODO many places using this, find a good way to extract,
-            new BcryptPasswordValidator(),
-            { verifyPassword: () => Promise.resolve({ valid: true }) }, // TODO add real policy,
-            new JWTRepository(),
+            repos.getAuthRepo(),
+            repos.getPasswordValidatorRepo(),
+            repos.getPasswordPolicyVerifierRepo(),
+            repos.getJwtRepo(),
         )
 
         const { token, auth } = await useCase.exec({

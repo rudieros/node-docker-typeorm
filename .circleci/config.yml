@@ -10,38 +10,34 @@ orbs:
 #  webhooks:
 #  - url: https://pru.appsimples.com.br/hooks/RXe5MFvQGspYYcxAj/CqR93J4SoCAv4ypHhyzt6AAnTCBv98eW7LT9Qwhg7E3hnDh7
 jobs:
+#  release-development:
+#    docker:
+#    - image: circleci/node:7.10
+#    working_directory: ~/repo
+#    steps:
+#    - checkout
+#    - restore_cache:
+#        name: Restore Yarn Package Cache
+#        key: yarn-packages-{{ checksum "yarn.lock" }}
+#    - run:
+#        name: Installing Dependencies
+#        command: yarn install --frozen-lockfile
+#    - save_cache:
+#        name: Save Yarn Package Cache
+#        key: yarn-packages-{{ checksum "yarn.lock" }}
+#        paths:
+#        - ~/.cache/yarn
+#    - run:
+#        name: Deploy development
+#        command: yarn deploy:development
+
+
   release-development:
-    docker:
-    - image: circleci/node:7.10
-    working_directory: ~/repo
-    steps:
-    - checkout
-    - restore_cache:
-        name: Restore Yarn Package Cache
-        key: yarn-packages-{{ checksum "yarn.lock" }}
-    - run:
-        name: Installing Dependencies
-        command: yarn install --frozen-lockfile
-    - save_cache:
-        name: Save Yarn Package Cache
-        key: yarn-packages-{{ checksum "yarn.lock" }}
-        paths:
-        - ~/.cache/yarn
-    - run:
-        name: Deploy development
-        command: yarn deploy:development
-
-
-  release-staging:
     docker:
       - image: circleci/python:2.7
     working_directory: ~/repo
     steps:
       - checkout
-      - run:
-          name: Print Content
-          command: |
-            ls -la
       - run:
           name: Install Elastic Beanstalk cli
           command: |
@@ -73,15 +69,15 @@ jobs:
         command: yarn deploy:production
 
 workflows:
-  version: 2
-  deploy-staging:
+  version: 2.1
+  deploy-development:
     jobs:
     - aws-ecr/build_and_push_image:
         account-url: AWS_ECR_REPO_URL
         repo: ${AWS_RESOURCE_NAME_PREFIX}
         region: AWS_DEFAULT_REGION
         tag: latest
-    - release-staging:
+    - release-development:
         requires:
           - aws-ecr/build_and_push_image
         filters:
@@ -89,7 +85,7 @@ workflows:
             only:
             - dev
 
-  build-and-deploy-development:
+  build-and-deploy-staging:
     jobs:
     - release-development:
         filters:
