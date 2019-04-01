@@ -1,0 +1,30 @@
+[
+  {
+    "name": "dev",
+    "type": "postgres",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "username": "admin",
+    "password": "admin",
+    "database": "pets",
+    "logging": true,
+    "synchronize": true,
+    "entities": [
+      "build/common/database/models/*.js"
+    ]
+  },
+  {
+    "name": "test",
+    "type": "postgres",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "username": "admin",
+    "password": "admin",
+    "database": "petstest",
+    "logging": false,
+    "synchronize": true,
+    "entities": [
+      "src/common/database/models/*.ts"
+    ]
+  }
+]
