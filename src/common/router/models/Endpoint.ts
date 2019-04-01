@@ -33,42 +33,26 @@ export class Endpoint<ResponseBody, Body = undefined, Params = undefined, Query 
     path?: string
     body?: new () => Body
     response?: new () => ResponseBody
-    allowedRoles?: string[]
+    allowRoles: string[] = []
+    denyRoles: string[] = []
 
-    constructor({
-        path,
-        body,
-        method,
-        service,
-        handler,
-        response,
-                }: Endpoint<ResponseBody, Body, Params, Query>) {
-        this.body = body
-        this.path = path
-        this.method = method
-        this.service = service
-        this.handler = handler
-        this.response = response
+    constructor(input: {
+        path: string,
+        body?: new () => Body,
+        method?: HttpMethod,
+        service: Service,
+        handler: Handler<ResponseBody, Body, Params, Query>,
+        response?: new () => ResponseBody,
+        allowRoles?: string[],
+        denyRoles?: string[],
+    }) {
+        this.body = input.body
+        this.path = input.path
+        this.method = input.method
+        this.service = input.service
+        this.handler = input.handler
+        this.response = input.response
+        this.allowRoles = input.allowRoles || this.allowRoles
+        this.denyRoles = input.denyRoles || this.denyRoles
     }
-
-    // method(method: HttpMethod) {
-    //     this.method = method
-    //     return this
-    // }
-    // service(service: Service) {
-    //     this.service = service
-    //     return this
-    // }
-    // path(path: string) {
-    //     this.path = path
-    //     return this
-    // }
-    // body(body: new () => Body, options?: InputOptions) {
-    //     this.body = body
-    // }
-    // allowRoles(allowedRoles: string[]) {
-    //     this.allowedRoles = allowedRoles
-    //     return this
-    // }
-
 }

@@ -1,6 +1,5 @@
 import { Router } from '../../common/router/models/Router'
 import { HttpMethod } from '../../common/router/models/HttpMethod'
-import { me } from './me'
 import { SampleEndpointBody, sampleEndpointHandler } from './sampleEndpointHandler'
 
 export default new Router({
@@ -13,10 +12,5 @@ export default new Router({
             handler: sampleEndpointHandler,
 
         },
-        {
-            path: 'me',
-            method: HttpMethod.GET,
-            handler: me,
-        }
     ]
 })

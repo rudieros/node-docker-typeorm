@@ -17,11 +17,11 @@ app.use(cors())
 setupDatabase() // TODO wait for connection?
 
 // Add JWT authentication, MUST BE BEFORE ROUTER
-expressUseJwtAuth(app, new TypeORMAuthDatabase({}), {
+const authorizerMiddleware = expressUseJwtAuth(app, new TypeORMAuthDatabase({}), {
     usernameField: 'email',
 })
 
-const router = createRouterExpress()
+const router = createRouterExpress({ authorizerMiddleware })
 
 app.use(router)
 

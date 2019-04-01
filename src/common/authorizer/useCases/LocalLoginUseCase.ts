@@ -1,26 +1,28 @@
-import express from 'express'
 import { TokenDataSource } from '../dataSources/TokenDataSource'
-import { LocalAuthenticatorDataSource } from '../dataSources/LocalAuthenticator'
-
-export interface PassportExpressLoginUseCaseInput {
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-}
+import { AuthDataSource } from '../dataSources/AuthDataSource'
+import { PasswordValidator } from '../dataSources/PasswordValidator'
+import { OSError } from '../../error'
+import { Auth } from '../models/Auth'
+import { NoPassword } from '../types/NoPasswordType'
 
 export class LocalLoginUseCase {
 
     constructor(
         private tokenDataSource: TokenDataSource,
-        private localAuthDataSource: LocalAuthenticatorDataSource,
+        private authDataSource: AuthDataSource,
+        private passwordValidator: PasswordValidator,
     ) {}
 
-    async exec() {
-        const user = await this.localAuthDataSource.authenticate()
+    async exec(username: string, password: string): Promise<{ token: string, auth: NoPassword<Auth> }> {
+        const { password: storedPassword, ...auth } = await this.authDataSource.findUserByUsername(username)
 
-        const token = await this.tokenDataSource.createToken(user)
+        await this.passwordValidator.verifyPassword(storedPassword, password).catch((e) => {
+            throw new OSError('Unauthorized', `Error validating password: ${e}`, 401)
+        })
 
-        return { user, token }
+        const token = await this.tokenDataSource.createToken(auth)
+
+        return { auth, token }
     }
 
 }

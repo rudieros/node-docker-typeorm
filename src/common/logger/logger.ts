@@ -1,7 +1,14 @@
-const template = (tag: string) => `[OS_LOGGER_${tag} - ${new Date().toISOString()}] -\n`
-export const logger = {
+export const defaultTemplate = (tag: string) => `[OS_LOGGER_${tag} - ${new Date().toISOString()}] -\n`
+
+export interface Logger {
+    info: (message: string) => void
+    warn: (message: string) => void
+    error: (message: string) => void
+}
+
+export const getLogger = (template = defaultTemplate) => ({
     info: (message: any) => {
-        console.log(colors.fg.Blue, template('INFO'), colors.Reset, message)
+        console.log(colors.fg.Cyan, template('INFO'), colors.Reset, message)
     },
     warn: (message: any) => {
         console.log(colors.fg.Yellow, template('WARNING'), colors.Reset, message)
@@ -9,7 +16,7 @@ export const logger = {
     error: (message: any) => {
         console.log(colors.fg.Red, template('ERROR'), colors.Reset, message)
     },
-}
+})
 
 const colors = {
     Reset: '\x1b[0m',

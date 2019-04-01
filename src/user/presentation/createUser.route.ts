@@ -11,16 +11,6 @@ export class CreateUserBody {
     email: string
 }
 
-// @Service(UserService)
-// @Path('/')
-// export default class CreateUserEndpoint {
-//     exec(
-//         @Body(CreateUserBody) body: CreateUserBody,
-//     ) {
-//         return
-//     }
-// }
-
 export default new Endpoint({
     service: UserService,
     path: '/',

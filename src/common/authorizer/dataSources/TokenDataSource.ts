@@ -1,4 +1,6 @@
+import { TokenPayload } from '../models/TokenPayload'
+
 export interface TokenDataSource {
-    createToken(user: any): Promise<string>
-    validateToken(token: string): Promise<any>
+    createToken(payload: TokenPayload): Promise<string>
+    validateToken(token: string): Promise<TokenPayload>
 }
