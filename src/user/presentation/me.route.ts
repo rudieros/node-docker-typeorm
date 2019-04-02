@@ -7,14 +7,15 @@ import { GetUserUseCase } from '../core/getUserUseCase'
 
 export default new Endpoint({
     handler: async ({ body }, { authorization: { id }, repos }: ApplicationContext) => {
-        const useCase = new GetUserUseCase(
-            repos.getAuthRepo() // TODO replace with user repo
-        )
-        return useCase.exec(id)
+        // const useCase = new GetUserUseCase(
+        //     repos.getAuthRepo() // TODO replace with user repo
+        // )
+        return {
+            env: process.env.NODE_ENV,
+        } as any
     },
     method: HttpMethod.GET,
     service: UserService,
     path: 'me',
-    response: User,
-    denyRoles: ['User']
+    response: User
 })

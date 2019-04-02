@@ -38,6 +38,14 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
+      - setup_remote_docker
+      - aws-ecr/build-and-push-image:
+          account-url: AWS_ECR_REPO_URL
+          repo: ${AWS_RESOURCE_NAME_PREFIX}
+          region: AWS_DEFAULT_REGION
+          tag: latest
+          checkout: false
+          extra-build-args: -e NODE_ENV='staging'
       - run:
           name: Install Elastic Beanstalk cli
           command: |
@@ -72,18 +80,18 @@ workflows:
   version: 2.1
   deploy-development:
     jobs:
-    - aws-ecr/build_and_push_image:
-        account-url: AWS_ECR_REPO_URL
-        repo: ${AWS_RESOURCE_NAME_PREFIX}
-        region: AWS_DEFAULT_REGION
-        tag: latest
+#    - aws-ecr/build_and_push_image:
+#        account-url: AWS_ECR_REPO_URL
+#        repo: ${AWS_RESOURCE_NAME_PREFIX}
+#        region: AWS_DEFAULT_REGION
+#        tag: latest
     - release-development:
-        requires:
-          - aws-ecr/build_and_push_image
+#        requires:
+#          - aws-ecr/build_and_push_image
         filters:
           branches:
             only:
-            - dev
+            - feat/ciTest
 
   build-and-deploy-staging:
     jobs:
